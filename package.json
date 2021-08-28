@@ -7,5 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "William Chargin <wchargin@gmail.com>",
-  "license": "GPL-2.0-only"
+  "license": "GPL-2.0-only",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
 }
