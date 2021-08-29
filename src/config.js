@@ -5,6 +5,9 @@ const chokidar = require("chokidar");
 
 const artblocks = require("./artblocks");
 
+const KEY_SALES_CHANNEL = "salesChannel";
+const KEY_LISTINGS_CHANNEL = "listingsChannel";
+
 async function loadFile(path) {
   const buf = await util.promisify(fs.readFile)(path);
   return JSON.parse(buf.toString());
@@ -48,16 +51,29 @@ class Config {
 
   isRelevantTokenId(tokenId) {
     if (this._config.watchAllProjects) return true;
+    return this._project(tokenId) != null;
+  }
+
+  _project(tokenId) {
     const projectId = artblocks.tokenIdToProjectId(tokenId);
-    return this._config.projects.some((p) => p.id === projectId);
+    return this._config.projects.find((p) => p.id === projectId);
   }
 
-  salesChannel() {
-    return this._config.discord.salesChannel;
+  salesChannel(tokenId) {
+    return this._discordChannel(KEY_SALES_CHANNEL, tokenId);
   }
 
-  listingsChannel() {
-    return this._config.discord.listingsChannel;
+  listingsChannel(tokenId) {
+    return this._discordChannel(KEY_LISTINGS_CHANNEL, tokenId);
+  }
+
+  _discordChannel(channelKey, tokenId) {
+    const project = this._project(tokenId);
+    const projectSpecificChannel = ((project || {}).discord || {})[channelKey];
+    if (projectSpecificChannel != null) {
+      return projectSpecificChannel;
+    }
+    return (this._config.discord || {})[channelKey] || null;
   }
 }
 
