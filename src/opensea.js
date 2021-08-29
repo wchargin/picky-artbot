@@ -2,6 +2,20 @@ const fetch = require("node-fetch");
 
 const EVENTS_URL = "https://api.opensea.io/api/v1/events";
 
+/**
+ * Fetches all OpenSea events matching the given query filters, and returns
+ * them in an array. Elements of the result array are objects with lots of
+ * fields, typically including:
+ *
+ *    - `event_id`, a number (stable across requests for the same event)
+ *    - `event_type`, a string like `"created"` or `"offer_entered"`
+ *    - `asset.token_id`, a numeric string like `"40000342"`
+ *
+ * OpenSea docs: <https://docs.opensea.io/reference/retrieving-asset-events>.
+ *
+ * Args: `source` should be either `{ contract }` or `{ slug }`; `since` and
+ * `until` should be `Date` objects or `null`.
+ */
 async function fetchEvents({ source, since, until, pageSize = 300 }) {
   const baseParams = {
     only_opensea: false,
@@ -66,6 +80,16 @@ async function fetchEvents({ source, since, until, pageSize = 300 }) {
   return results;
 }
 
+/**
+ * Fetches all OpenSea events from the given source every `pollMs` milliseconds
+ * and calls the `handleEvent` callback on each new event as it arrives.
+ *
+ * The `lookbackMs` parameter works around lossy behavior in the OpenSea API
+ * with small poll intervals, wherein events can be newly added to the stream
+ * with timestamps in the past (off by 30 seconds or so). To see those events
+ * at all, we extend the leading edge of the time window by `lookbackMs`
+ * milliseconds. A value of `60000` (60 seconds) seems to work okay.
+ */
 async function streamEvents({
   source,
   pollMs,

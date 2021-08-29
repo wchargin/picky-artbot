@@ -7,6 +7,11 @@ const artblocks = require("./artblocks");
 const { Config } = require("./config");
 const opensea = require("./opensea");
 
+/**
+ * Creates a Discord bot client and authenticates with the token specified in
+ * the environment. Returns a promise that resolves to that bot once it's ready
+ * to start working, or rejects on failure.
+ */
 async function createBot() {
   const token = process.env.DISCORD_TOKEN;
   if (!token) {
@@ -23,6 +28,14 @@ async function createBot() {
   return p;
 }
 
+/**
+ * Handles an OpenSea event for an NFT, such as a listing, sale, or bid, by
+ * checking whether we care about the event and posting to Discord if so.
+ *
+ * Args: `config` should be a `Config` instance; `bot` should be a Discord
+ * `Client` instance; `event` should be an OpenSea object, as passed to the
+ * callback for `opensea.streamEvents`.
+ */
 function reportEvent(config, bot, event) {
   if (!config.isRelevantTokenId(event.asset.token_id)) return;
   switch (event.event_type) {
@@ -47,6 +60,10 @@ function handleSaleEvent(config, bot, e) {
   sendMessage(config, bot, config.salesChannel(e.asset.token_id), msg);
 }
 
+/**
+ * Sends a message to a Discord channel and also logs it to the console. If
+ * `channelId` is `null`, the message is still logged but not sent to Discord.
+ */
 function sendMessage(config, bot, channelId, msg) {
   console.log(`[->${channelId}]`, msg);
   if (config.dryRun()) return;
