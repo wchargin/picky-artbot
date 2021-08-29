@@ -65,7 +65,6 @@ async function streamEvents({
   let lastEventIds = new Set();
   let since = new Date();
   while (true) {
-    await sleep(pollMs);
     const until = new Date();
 
     const events = await fetchEvents({
@@ -89,6 +88,7 @@ async function streamEvents({
     }
     lastEventIds = newEventIds;
     since = until;
+    await sleep(pollMs);
   }
 }
 
