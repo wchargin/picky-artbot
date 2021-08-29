@@ -48,6 +48,7 @@ function handleSaleEvent(config, bot, e) {
 function sendMessage(config, bot, channelId, msg) {
   console.log(`[->${channelId}]`, msg);
   if (config.dryRun()) return;
+  if (!channelId) return;
   bot.channels.cache.get(channelId).send(msg);
 }
 
