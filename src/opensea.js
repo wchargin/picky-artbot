@@ -104,17 +104,21 @@ async function streamEvents({
       try {
         handleEvent(event);
       } catch (e) {
-        console.error(
-          `failed to handle ${
-            typeof event === "object" ? event.id : "event"
-          }: ${e}`
-        );
+        console.error(`failed to handle ${describeEvent(event)}: ${e}`);
       }
     }
     lastEventIds = newEventIds;
     since = until;
     await sleep(pollMs);
   }
+}
+
+function describeEvent(e) {
+  if (typeof e !== "object") return `event ${e}`;
+  const id = e.id || "?";
+  const type = e.event_type || "<unknown event type>";
+  const name = (e.asset || {}).name || "<unknown asset>";
+  return `event ${id} ("${name}" ${type})`;
 }
 
 async function sleep(ms) {
