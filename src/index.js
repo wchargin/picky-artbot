@@ -10,6 +10,10 @@ const opensea = require("./opensea");
 const SLUGS = ["art-blocks", "art-blocks-curated", "art-blocks-factory"];
 
 async function createBot() {
+  const token = process.env.DISCORD_TOKEN;
+  if (!token) {
+    throw new Error("missing Discord token (see README)");
+  }
   const bot = new discord.Client({ intents: [discord.Intents.FLAGS.GUILDS] });
   const p = new Promise((res) => {
     bot.on("ready", () => {
@@ -17,7 +21,7 @@ async function createBot() {
       res(bot);
     });
   });
-  bot.login(process.env.DISCORD_TOKEN);
+  bot.login(token);
   return p;
 }
 
