@@ -118,7 +118,8 @@ function describeEvent(e) {
   const id = e.id || "?";
   const type = e.event_type || "<unknown event type>";
   const name = (e.asset || {}).name || "<unknown asset>";
-  return `event ${id} ("${name}" ${type})`;
+  const when = e.created_date || "<unknown date>";
+  return `event ${id} ("${name}" ${type} @ ${when})`;
 }
 
 async function sleep(ms) {
