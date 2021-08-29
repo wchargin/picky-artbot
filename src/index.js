@@ -40,6 +40,8 @@ async function fetchArtblocksEvents({ since, until }) {
 
 function reportEvent(e) {
   const tokenId = String(e.asset.token_id).padStart(10);
+  const type = e.event_type;
+  const name = e.asset.name;
   const ts = e.created_date;
   const permalink = e.asset.permalink;
   let descr = "[?]";
@@ -55,7 +57,7 @@ function reportEvent(e) {
       break;
   }
   console.log(
-    `[${e.id}] ${ts} ${tokenId}: ${e.event_type.padEnd(20)} | ${descr}`
+    `[${e.id}] ${ts} ${type.padEnd(16)} ${descr} on ${tokenId} "${name}"`
   );
 }
 
