@@ -1,8 +1,13 @@
+const artblocks = require("./artblocks");
 const opensea = require("./opensea");
 
 const ART_BLOCKS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
+const WATCHED_PROJECT_ID = 28; // Apparitions; tends to see a fair amount of offer_created traffic
+
 function reportEvent(e) {
+  const projectId = artblocks.tokenIdToProjectId(e.asset.token_id);
+  if (projectId !== WATCHED_PROJECT_ID) return;
   const tokenId = String(e.asset.token_id).padStart(10);
   const type = e.event_type;
   const name = e.asset.name;
