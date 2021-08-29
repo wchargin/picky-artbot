@@ -37,6 +37,12 @@ async function fetchEvents({ contract, since, until, pageSize = 300 }) {
     }
   }
 
+  results.sort((a, b) => {
+    const ta = a.created_date;
+    const tb = b.created_date;
+    return ta > tb ? 1 : ta < tb ? -1 : 0;
+  });
+
   return results;
 }
 
