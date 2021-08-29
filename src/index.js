@@ -7,8 +7,6 @@ const artblocks = require("./artblocks");
 const { Config } = require("./config");
 const opensea = require("./opensea");
 
-const SLUGS = ["art-blocks", "art-blocks-curated", "art-blocks-factory"];
-
 async function createBot() {
   const token = process.env.DISCORD_TOKEN;
   if (!token) {
@@ -71,7 +69,7 @@ async function main() {
   const configPath = path.join(__dirname, "..", "config.json");
   const config = await Config.watchingFile(configPath);
   const bot = await createBot();
-  for (const slug of SLUGS) {
+  for (const slug of artblocks.COLLECTION_SLUGS) {
     opensea.streamEvents({
       source: { slug },
       pollMs: 5000,
