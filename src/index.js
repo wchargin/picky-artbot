@@ -56,6 +56,9 @@ function reportEvent(e) {
     case "successful":
       descr = `paid ${formatWei(e.total_price)}`;
       break;
+    case "transfer":
+      descr = `tx ${e.transaction.transaction_hash}`;
+      break;
   }
   console.log(
     `[${e.id}] ${ts} ${type.padEnd(16)} ${descr} on ${tokenId} "${name}"`
