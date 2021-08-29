@@ -47,6 +47,7 @@ function reportEvent(e) {
   let descr = "[?]";
   switch (e.event_type) {
     case "offer_entered":
+    case "bid_entered":
       descr = `bid ${formatWei(e.bid_amount)}`;
       break;
     case "created":
