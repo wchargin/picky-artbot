@@ -48,4 +48,69 @@ async function fetchEvents({ contract, since, until, pageSize = 300 }) {
   return results;
 }
 
-module.exports = { fetchEvents };
+async function streamEvents({
+  contract,
+  pollMs,
+  lookbackMs,
+  handleEvent,
+  pageSize = 300,
+}) {
+  if (typeof pollMs !== "number") {
+    throw new Error(`pollMs: ${pollMs}`);
+  }
+  if (typeof lookbackMs !== "number") {
+    throw new Error(`lookbackMs: ${lookbackMs}`);
+  }
+
+  let lastEventIds = new Set();
+  let since = new Date();
+  while (true) {
+    await sleep(pollMs);
+    const until = new Date();
+    lastEventIds = await streamEventsBlock({
+      contract,
+      since: new Date(+since - lookbackMs),
+      until,
+      handleEvent,
+      lastEventIds,
+    });
+    since = until;
+  }
+}
+
+async function streamEventsBlock({
+  contract,
+  since,
+  until,
+  handleEvent,
+  lastEventIds,
+}) {
+  const events = await fetchEvents({
+    contract,
+    since,
+    until,
+  });
+  for (const event of events) {
+    if (lastEventIds.has(event.id)) {
+      continue;
+    }
+    try {
+      handleEvent(event);
+    } catch (e) {
+      console.error(
+        `failed to handle ${
+          typeof event === "object" ? event.id : "event"
+        }: ${e}`
+      );
+    }
+  }
+  return new Set(events.map((e) => e.id));
+}
+
+async function sleep(ms) {
+  return new Promise((res) => {
+    setTimeout(() => res(), ms);
+  });
+}
+
+module.exports = { fetchEvents, streamEvents };
