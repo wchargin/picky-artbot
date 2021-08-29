@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js 2>&1 | TZ=UTC ts '%Y-%m-%dT%.TZ]'",
+    "start": "node src/index.js 2>&1 | TZ=UTC ts '%Y-%m-%dT%H:%M:%.SZ]'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npm run prettier:check",
     "fix": "npm run prettier:write",
