@@ -19,7 +19,7 @@ async function createBot() {
       res(bot);
     });
   });
-  bot.login(token);
+  await bot.login(token);
   return p;
 }
 
