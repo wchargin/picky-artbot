@@ -1,6 +1,6 @@
 const opensea = require("./opensea");
 
-const ART_BLOCKS_CURATED = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
+const ART_BLOCKS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
 function reportEvent(e) {
   const tokenId = String(e.asset.token_id).padStart(10);
@@ -42,7 +42,7 @@ function formatWei(wei) {
 
 async function main() {
   opensea.streamEvents({
-    contract: ART_BLOCKS_CURATED,
+    contract: ART_BLOCKS,
     pollMs: 5000,
     lookbackMs: 60000,
     handleEvent: reportEvent,
