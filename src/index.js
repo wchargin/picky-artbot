@@ -36,17 +36,19 @@ function reportEvent(config, bot, event) {
 function handleListingEvent(config, bot, e) {
   const description = `${e.asset.name} listed for ${formatWei(e.ending_price)}`;
   const msg = `${description} <${e.asset.permalink}>`;
-  const channel = bot.channels.cache.get(config.listingsChannel());
-  console.log(msg);
-  if (!config.dryRun()) channel.send(msg);
+  sendMessage(config, bot, config.listingsChannel(), msg);
 }
 
 function handleSaleEvent(config, bot, e) {
   const description = `${e.asset.name} sold for ${formatWei(e.total_price)}`;
   const msg = `${description} <${e.asset.permalink}>`;
-  const channel = bot.channels.cache.get(config.salesChannel());
+  sendMessage(config, bot, config.salesChannel(), msg);
+}
+
+function sendMessage(config, bot, channelId, msg) {
   console.log(msg);
-  if (!config.dryRun()) channel.send(msg);
+  if (config.dryRun()) return;
+  bot.channels.cache.get(channelId).send(msg);
 }
 
 function formatWei(wei) {
