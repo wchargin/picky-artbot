@@ -62,7 +62,13 @@ function reportEvent(e) {
 }
 
 function formatWei(wei) {
-  const eth = Number(BigInt(wei) / 10n ** 15n) / 10 ** 3;
+  let bigwei;
+  try {
+    bigwei = BigInt(wei);
+  } catch (e) {
+    return "[?] ETH";
+  }
+  const eth = Number(bigwei / 10n ** 15n) / 10 ** 3;
   return `${eth.toFixed(3)} ETH`;
 }
 
