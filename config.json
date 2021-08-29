@@ -1,7 +1,7 @@
 {
   "projects": [
-    { "id": 28, "name": "Apparitions" },
-    { "id": 39, "name": "Synapses" },
+    { "id": 0, "name": "Chromie Squiggles" },
+    { "id": 40, "name": "Algobots" },
     {
       "id": 116,
       "name": "Flowers",
