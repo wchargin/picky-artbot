@@ -43,6 +43,7 @@ class Config {
   }
 
   isRelevantTokenId(tokenId) {
+    if (this._config.watchAllProjects) return true;
     const projectId = artblocks.tokenIdToProjectId(tokenId);
     return this._config.projects.some((p) => p.id === projectId);
   }
