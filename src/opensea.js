@@ -34,6 +34,8 @@ async function fetchEvents({ contract, since, until, pageSize = 300 }) {
     results.push(...events);
     if (events.length < pageSize) {
       break;
+    } else {
+      offset += events.length;
     }
   }
 
