@@ -1,4 +1,7 @@
+require("dotenv").config();
 const path = require("path");
+
+const discord = require("discord.js");
 
 const artblocks = require("./artblocks");
 const { Config } = require("./config");
@@ -6,32 +9,44 @@ const opensea = require("./opensea");
 
 const ART_BLOCKS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
-function reportEvent(config, e) {
-  if (!config.isRelevantTokenId(e.asset.token_id)) return;
-  const tokenId = String(e.asset.token_id).padStart(10);
-  const type = e.event_type;
-  const name = e.asset.name;
-  const ts = e.created_date;
-  const permalink = e.asset.permalink;
-  let descr = "[?]";
-  switch (e.event_type) {
-    case "offer_entered":
-    case "bid_entered":
-      descr = `bid ${formatWei(e.bid_amount)}`;
-      break;
+async function createBot() {
+  const bot = new discord.Client({ intents: [discord.Intents.FLAGS.GUILDS] });
+  const p = new Promise((res) => {
+    bot.on("ready", () => {
+      console.error(`bot ready as identity ${bot.user.tag}`);
+      res(bot);
+    });
+  });
+  bot.login(process.env.DISCORD_TOKEN);
+  return p;
+}
+
+function reportEvent(config, bot, event) {
+  if (!config.isRelevantTokenId(event.asset.token_id)) return;
+  switch (event.event_type) {
     case "created":
-      descr = `listed for ${formatWei(e.ending_price)}`;
+      handleListingEvent(config, bot, event);
       break;
     case "successful":
-      descr = `paid ${formatWei(e.total_price)}`;
-      break;
-    case "transfer":
-      descr = `tx ${e.transaction.transaction_hash}`;
+      handleSaleEvent(config, bot, event);
       break;
   }
-  console.log(
-    `[${e.id}] ${ts} ${type.padEnd(16)} ${descr} on ${tokenId} "${name}"`
-  );
+}
+
+function handleListingEvent(config, bot, e) {
+  const description = `${e.asset.name} listed for ${formatWei(e.ending_price)}`;
+  const msg = `${description} <${e.asset.permalink}>`;
+  const channel = bot.channels.cache.get(config.listingsChannel());
+  console.log(msg);
+  channel.send(msg);
+}
+
+function handleSaleEvent(config, bot, e) {
+  const description = `${e.asset.name} sold for ${formatWei(e.total_price)}`;
+  const msg = `${description} <${e.asset.permalink}>`;
+  const channel = bot.channels.cache.get(config.salesChannel());
+  console.log(msg);
+  channel.send(msg);
 }
 
 function formatWei(wei) {
@@ -48,11 +63,12 @@ function formatWei(wei) {
 async function main() {
   const configPath = path.join(__dirname, "..", "config.json");
   const config = await Config.watchingFile(configPath);
+  const bot = await createBot();
   opensea.streamEvents({
     contract: ART_BLOCKS,
     pollMs: 5000,
     lookbackMs: 60000,
-    handleEvent: (e) => reportEvent(config, e),
+    handleEvent: (e) => reportEvent(config, bot, e),
   });
 }
 

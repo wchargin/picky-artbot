@@ -2,5 +2,9 @@
   "projects": [
     { "id": 28, "name": "Apparitions" },
     { "id": 39, "name": "Synapses" }
-  ]
+  ],
+  "discord": {
+    "salesChannel": "879947134173057055",
+    "listingsChannel": "879947121372053516"
+  }
 }

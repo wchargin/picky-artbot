@@ -46,6 +46,14 @@ class Config {
     const projectId = artblocks.tokenIdToProjectId(tokenId);
     return this._config.projects.some((p) => p.id === projectId);
   }
+
+  salesChannel() {
+    return this._config.discord.salesChannel;
+  }
+
+  listingsChannel() {
+    return this._config.discord.listingsChannel;
+  }
 }
 
 module.exports = { Config };
