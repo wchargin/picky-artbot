@@ -8,24 +8,34 @@ async function sleep(ms) {
   });
 }
 
-async function streamEvents({ latencyMs }) {
-  if (typeof latencyMs !== "number") throw new Error(`latencyMs: ${latencyMs}`);
+async function streamEvents({ pollMs, lookbackMs }) {
+  if (typeof pollMs !== "number") throw new Error(`pollMs: ${pollMs}`);
+  if (typeof lookbackMs !== "number")
+    throw new Error(`lookbackMs: ${lookbackMs}`);
+  let lastEventIds = new Set();
   let since = new Date();
   while (true) {
-    await sleep(latencyMs);
+    await sleep(pollMs);
     const until = new Date();
-    await fetchArtblocksEvents({ since, until });
+    lastEventIds = await fetchArtblocksEvents({
+      since: new Date(+since - lookbackMs),
+      until,
+      lastEventIds,
+    });
     since = until;
   }
 }
 
-async function fetchArtblocksEvents({ since, until }) {
+async function fetchArtblocksEvents({ since, until, lastEventIds }) {
   const events = await opensea.fetchEvents({
     contract: ART_BLOCKS_CURATED,
     since,
     until,
   });
   for (const event of events) {
+    if (lastEventIds.has(event.id)) {
+      continue;
+    }
     try {
       reportEvent(event);
     } catch (e) {
@@ -36,6 +46,7 @@ async function fetchArtblocksEvents({ since, until }) {
       );
     }
   }
+  return new Set(events.map((e) => e.id));
 }
 
 function reportEvent(e) {
@@ -77,7 +88,7 @@ function formatWei(wei) {
 }
 
 async function main() {
-  streamEvents({ latencyMs: 5000 });
+  streamEvents({ pollMs: 5000, lookbackMs: 60000 });
 }
 
 main().catch((e) => {
