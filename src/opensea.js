@@ -7,9 +7,13 @@ async function fetchEvents({ contract, since, until, pageSize = 300 }) {
     asset_contract_address: contract,
     only_opensea: false,
     limit: pageSize,
-    occurred_after: Math.floor(since / 1000),
-    occurred_before: Math.floor(until / 1000),
   };
+  if (since != null) {
+    baseParams.occurred_after = Math.floor(since / 1000);
+  }
+  if (until != null) {
+    baseParams.occurred_before = Math.floor(until / 1000);
+  }
 
   const results = [];
   let offset = 0;
