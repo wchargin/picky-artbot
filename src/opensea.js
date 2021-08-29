@@ -2,12 +2,17 @@ const fetch = require("node-fetch");
 
 const EVENTS_URL = "https://api.opensea.io/api/v1/events";
 
-async function fetchEvents({ contract, since, until, pageSize = 300 }) {
+async function fetchEvents({ source, since, until, pageSize = 300 }) {
   const baseParams = {
-    asset_contract_address: contract,
     only_opensea: false,
     limit: pageSize,
   };
+  if (source.contract != null) {
+    baseParams.asset_contract_address = source.contract;
+  }
+  if (source.slug != null) {
+    baseParams.collection_slug = source.slug;
+  }
   if (since != null) {
     baseParams.occurred_after = Math.floor(since / 1000);
   }
@@ -49,7 +54,7 @@ async function fetchEvents({ contract, since, until, pageSize = 300 }) {
 }
 
 async function streamEvents({
-  contract,
+  source,
   pollMs,
   lookbackMs,
   handleEvent,
@@ -68,7 +73,7 @@ async function streamEvents({
     const until = new Date();
 
     const events = await fetchEvents({
-      contract,
+      source,
       since: new Date(+since - lookbackMs),
       until,
     });

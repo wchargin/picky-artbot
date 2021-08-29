@@ -7,7 +7,7 @@ const artblocks = require("./artblocks");
 const { Config } = require("./config");
 const opensea = require("./opensea");
 
-const ART_BLOCKS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
+const SLUGS = ["art-blocks", "art-blocks-curated", "art-blocks-factory"];
 
 async function createBot() {
   const bot = new discord.Client({ intents: [discord.Intents.FLAGS.GUILDS] });
@@ -64,12 +64,14 @@ async function main() {
   const configPath = path.join(__dirname, "..", "config.json");
   const config = await Config.watchingFile(configPath);
   const bot = await createBot();
-  opensea.streamEvents({
-    contract: ART_BLOCKS,
-    pollMs: 5000,
-    lookbackMs: 60000,
-    handleEvent: (e) => reportEvent(config, bot, e),
-  });
+  for (const slug of SLUGS) {
+    opensea.streamEvents({
+      source: { slug },
+      pollMs: 5000,
+      lookbackMs: 60000,
+      handleEvent: (e) => reportEvent(config, bot, e),
+    });
+  }
 }
 
 main().catch((e) => {
