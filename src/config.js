@@ -42,6 +42,10 @@ class Config {
     return config;
   }
 
+  dryRun() {
+    return !!this._config.dryRun;
+  }
+
   isRelevantTokenId(tokenId) {
     if (this._config.watchAllProjects) return true;
     const projectId = artblocks.tokenIdToProjectId(tokenId);

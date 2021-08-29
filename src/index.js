@@ -38,7 +38,7 @@ function handleListingEvent(config, bot, e) {
   const msg = `${description} <${e.asset.permalink}>`;
   const channel = bot.channels.cache.get(config.listingsChannel());
   console.log(msg);
-  channel.send(msg);
+  if (!config.dryRun()) channel.send(msg);
 }
 
 function handleSaleEvent(config, bot, e) {
@@ -46,7 +46,7 @@ function handleSaleEvent(config, bot, e) {
   const msg = `${description} <${e.asset.permalink}>`;
   const channel = bot.channels.cache.get(config.salesChannel());
   console.log(msg);
-  channel.send(msg);
+  if (!config.dryRun()) channel.send(msg);
 }
 
 function formatWei(wei) {
