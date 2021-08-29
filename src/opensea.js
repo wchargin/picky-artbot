@@ -25,17 +25,30 @@ async function fetchEvents({ source, since, until, pageSize = 300 }) {
   while (true) {
     const params = { ...baseParams, offset };
     const url = `${EVENTS_URL}?${String(new URLSearchParams(params))}`;
-    const res = await fetch(url).then((res) => res.json());
-    if (typeof res !== "object") {
-      throw new Error(`Unexpected response: ${JSON.stringify(res)}`);
+    const res = await fetch(url);
+    if (!res.ok) {
+      const body = await res.text().catch((e) => "<read failed>");
+      throw new Error(`${url}: HTTP ${res.status} ${res.statusText}: ${body}`);
     }
-    if (res.success == false) {
-      throw new Error(`Failure: ${JSON.stringify(res)}`);
+    const text = await res.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      throw new Error(
+        `${url}: invalid JSON: ${e.message}: ${JSON.stringify(text)}`
+      );
     }
-    if (!Array.isArray(res.asset_events)) {
-      throw new Error(`Missing asset_events: ${JSON.stringify(res)}`);
+    if (typeof json !== "object") {
+      throw new Error(`${url}: unexpected response: ${JSON.stringify(json)}`);
     }
-    const events = res.asset_events;
+    if (json.success == false) {
+      throw new Error(`${url}: failure: ${JSON.stringify(json)}`);
+    }
+    if (!Array.isArray(json.asset_events)) {
+      throw new Error(`${url}: missing asset_events: ${JSON.stringify(json)}`);
+    }
+    const events = json.asset_events;
     results.push(...events);
     if (events.length < pageSize) {
       break;
@@ -72,11 +85,18 @@ async function streamEvents({
   while (true) {
     const until = new Date();
 
-    const events = await fetchEvents({
-      source,
-      since: new Date(+since - lookbackMs),
-      until,
-    });
+    let events = [];
+    try {
+      events = await fetchEvents({
+        source,
+        since: new Date(+since - lookbackMs),
+        until,
+      });
+    } catch (e) {
+      console.error(`failed to fetch events: ${e}`);
+      // Fall through with `events = []`.
+    }
+
     const newEventIds = new Set();
     for (const event of events) {
       newEventIds.add(event.id);
