@@ -67,44 +67,29 @@ async function streamEvents({
   while (true) {
     await sleep(pollMs);
     const until = new Date();
-    lastEventIds = await streamEventsBlock({
+
+    const events = await fetchEvents({
       contract,
       since: new Date(+since - lookbackMs),
       until,
-      handleEvent,
-      lastEventIds,
     });
+    const newEventIds = new Set();
+    for (const event of events) {
+      newEventIds.add(event.id);
+      if (lastEventIds.has(event.id)) continue;
+      try {
+        handleEvent(event);
+      } catch (e) {
+        console.error(
+          `failed to handle ${
+            typeof event === "object" ? event.id : "event"
+          }: ${e}`
+        );
+      }
+    }
+    lastEventIds = newEventIds;
     since = until;
   }
-}
-
-async function streamEventsBlock({
-  contract,
-  since,
-  until,
-  handleEvent,
-  lastEventIds,
-}) {
-  const events = await fetchEvents({
-    contract,
-    since,
-    until,
-  });
-  for (const event of events) {
-    if (lastEventIds.has(event.id)) {
-      continue;
-    }
-    try {
-      handleEvent(event);
-    } catch (e) {
-      console.error(
-        `failed to handle ${
-          typeof event === "object" ? event.id : "event"
-        }: ${e}`
-      );
-    }
-  }
-  return new Set(events.map((e) => e.id));
 }
 
 async function sleep(ms) {
