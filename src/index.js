@@ -1,3 +1,5 @@
+const path = require("path");
+
 const artblocks = require("./artblocks");
 const { Config } = require("./config");
 const opensea = require("./opensea");
@@ -44,7 +46,8 @@ function formatWei(wei) {
 }
 
 async function main() {
-  const config = new Config(require("../config.json"));
+  const configPath = path.join(__dirname, "..", "config.json");
+  const config = await Config.watchingFile(configPath);
   opensea.streamEvents({
     contract: ART_BLOCKS,
     pollMs: 5000,
