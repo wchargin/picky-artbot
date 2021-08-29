@@ -53,7 +53,7 @@ function reportEvent(e) {
       descr = `listed for ${formatWei(e.ending_price)}`;
       break;
     case "successful":
-      descr = `paid ${formatWei(e.bid_amount)}`;
+      descr = `paid ${formatWei(e.total_price)}`;
       break;
   }
   console.log(
