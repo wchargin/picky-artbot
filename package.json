@@ -14,6 +14,7 @@
   "author": "William Chargin <wchargin@gmail.com>",
   "license": "GPL-2.0-only",
   "dependencies": {
+    "chokidar": "^3.5.2",
     "node-fetch": "^2.6.1",
     "prettier": "2.3.2"
   }
