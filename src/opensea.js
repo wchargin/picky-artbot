@@ -91,7 +91,7 @@ async function fetchEvents({ source, since, until, pageSize = 300 }) {
  * milliseconds. A value of `60000` (60 seconds) seems to work okay.
  */
 async function streamEvents({
-  source,
+  sources,
   pollMs,
   lookbackMs,
   handleEvent,
@@ -109,17 +109,22 @@ async function streamEvents({
   while (true) {
     const until = new Date();
 
-    let events = [];
-    try {
-      events = await fetchEvents({
-        source,
-        since: new Date(+since - lookbackMs),
-        until,
-      });
-    } catch (e) {
-      console.error(`failed to fetch events: ${e}`);
-      // Fall through with `events = []`.
-    }
+    const events = [].concat(
+      ...(await Promise.all(
+        sources.map((source) => {
+          return fetchEvents({
+            source,
+            since: new Date(+since - lookbackMs),
+            until,
+          }).catch((e) => {
+            console.error(
+              `failed to fetch events for ${JSON.stringify(source)}: ${e}`
+            );
+            return [];
+          });
+        })
+      ))
+    );
 
     const newEventIds = new Set();
     for (const event of events) {

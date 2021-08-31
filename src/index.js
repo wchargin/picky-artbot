@@ -133,14 +133,12 @@ async function main() {
   const configPath = path.join(__dirname, "..", "config.json");
   const config = await Config.watchingFile(configPath);
   const bot = await createBot();
-  for (const slug of artblocks.COLLECTION_SLUGS) {
-    opensea.streamEvents({
-      source: { slug },
-      pollMs: 5000,
-      lookbackMs: 60000,
-      handleEvent: (e) => reportEvent(config, bot, e),
-    });
-  }
+  opensea.streamEvents({
+    sources: artblocks.COLLECTION_SLUGS.map((slug) => ({ slug })),
+    pollMs: 5000,
+    lookbackMs: 60000,
+    handleEvent: (e) => reportEvent(config, bot, e),
+  });
 }
 
 process.on("unhandledRejection", (reason, promise) => {
