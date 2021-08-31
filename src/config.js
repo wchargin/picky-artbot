@@ -49,26 +49,38 @@ class Config {
     return !!this._config.dryRun;
   }
 
-  isRelevantTokenId(tokenId) {
-    if (this._config.watchAllProjects) return true;
-    return this._project(tokenId) != null;
+  isRelevant(asset) {
+    if (isArtblocks(asset) && this._config.watchAllArtblocks) {
+      return true;
+    }
+    return this._project(asset) != null;
   }
 
-  _project(tokenId) {
-    const projectId = artblocks.tokenIdToProjectId(tokenId);
-    return this._config.projects.find((p) => p.id === projectId);
+  _project(asset) {
+    if (isArtblocks(asset)) {
+      const projectId = artblocks.tokenIdToProjectId(asset.token_id);
+      const artblocksProject = this._config.projects.find(
+        (p) => p.artblocksProject === projectId
+      );
+      if (artblocksProject != null) return artblocksProject;
+    }
+    const collectionSlug = (asset.collection || {}).slug;
+    if (collectionSlug == null) return null;
+    return this._config.projects.find(
+      (p) => p.collectionSlug === collectionSlug
+    );
   }
 
-  salesChannel(tokenId) {
-    return this._discordChannel(KEY_SALES_CHANNEL, tokenId);
+  salesChannel(asset) {
+    return this._discordChannel(KEY_SALES_CHANNEL, asset);
   }
 
-  listingsChannel(tokenId) {
-    return this._discordChannel(KEY_LISTINGS_CHANNEL, tokenId);
+  listingsChannel(asset) {
+    return this._discordChannel(KEY_LISTINGS_CHANNEL, asset);
   }
 
-  _discordChannel(channelKey, tokenId) {
-    const project = this._project(tokenId);
+  _discordChannel(channelKey, asset) {
+    const project = this._project(asset);
     const projectSpecificChannel = ((project || {}).discord || {})[channelKey];
     if (projectSpecificChannel != null) {
       return projectSpecificChannel;
@@ -77,8 +89,32 @@ class Config {
   }
 
   collectionSlugs() {
-    return artblocks.COLLECTION_SLUGS;
+    const slugs = new Set();
+    function addArtblocksSlugs() {
+      for (const slug of artblocks.COLLECTION_SLUGS) {
+        slugs.add(slug);
+      }
+    }
+    if (this._config.watchAllArtblocks) {
+      addArtblocksSlugs();
+    }
+    for (const project of this._config.projects) {
+      if (project.collectionSlug) {
+        slugs.add(project.collectionSlug);
+      }
+      if (project.artblocksProject) {
+        addArtblocksSlugs();
+      }
+    }
+    return Array.from(slugs);
   }
+}
+
+function isArtblocks(asset) {
+  return (
+    asset.collection != null &&
+    artblocks.COLLECTION_SLUGS.includes(asset.collection.slug)
+  );
 }
 
 module.exports = { Config };

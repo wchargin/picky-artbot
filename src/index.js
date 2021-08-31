@@ -37,7 +37,7 @@ async function createBot() {
  * callback for `opensea.streamEvents`.
  */
 function reportEvent(config, bot, event) {
-  if (!config.isRelevantTokenId(event.asset.token_id)) return;
+  if (!config.isRelevant(event.asset)) return;
   switch (event.event_type) {
     case "created":
       handleListingEvent(config, bot, event);
@@ -90,7 +90,7 @@ function handleListingEvent(config, bot, e) {
   const content = `${asset.name} listed for ${formatWei(e.ending_price)} <${
     asset.permalink
   }>`;
-  sendMessage(config, bot, config.listingsChannel(e.asset.token_id), {
+  sendMessage(config, bot, config.listingsChannel(asset), {
     content,
     embeds: [assetEmbed(asset)],
   });
@@ -101,7 +101,7 @@ function handleSaleEvent(config, bot, e) {
   const content = `${asset.name} sold for ${formatWei(e.total_price)} <${
     asset.permalink
   }>`;
-  sendMessage(config, bot, config.salesChannel(e.asset.token_id), {
+  sendMessage(config, bot, config.salesChannel(asset), {
     content,
     embeds: [assetEmbed(asset)],
   });

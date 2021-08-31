@@ -1,13 +1,37 @@
 {
   "projects": [
-    { "id": 0, "name": "Chromie Squiggles" },
-    { "id": 40, "name": "Algobots" },
+    { "artblocksProject": 0, "name": "Chromie Squiggles" },
+    { "artblocksProject": 40, "name": "Algobots" },
     {
-      "id": 116,
+      "artblocksProject": 116,
       "name": "Flowers",
       "discord": {
         "salesChannel": "881610202087043133",
         "listingsChannel": "881610258848550943"
+      }
+    },
+    {
+      "collectionSlug": "cryptopunks",
+      "name": "Cryptopunks",
+      "discord": {
+        "salesChannel": "882373378206482442",
+        "listingsChannel": "882373378206482442"
+      }
+    },
+    {
+      "collectionSlug": "autoglyphs",
+      "name": "Autoglyphs",
+      "discord": {
+        "salesChannel": "882373427594420294",
+        "listingsChannel": "882373427594420294"
+      }
+    },
+    {
+      "collectionSlug": "deafbeef",
+      "name": "Deafbeef",
+      "discord": {
+        "salesChannel": "882373393150775338",
+        "listingsChannel": "882373393150775338"
       }
     }
   ],

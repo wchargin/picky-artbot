@@ -51,7 +51,7 @@ strings containing only numbers; consult the sample config for examples.
 ## Debugging
 
 For debugging purposes, it can be useful to add `"dryRun": true` and
-`"watchAllProjects": true` to `config.json`. Setting `watchAllProjects` skips
+`"watchAllArtblocks": true` to `config.json`. Setting `watchAllArtblocks` skips
 the token ID filtering, so all Art Blocks tokens are considered relevant.
 Setting `dryRun` causes the bot to not actually send messages to Discord, but
 still print messages to the console.
