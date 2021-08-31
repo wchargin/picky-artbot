@@ -48,16 +48,63 @@ function reportEvent(config, bot, event) {
   }
 }
 
+/**
+ * Creates a `discord.MessageEmbed` for the given OpenSea `event.asset`.
+ */
+function assetEmbed(asset) {
+  asset = asset || {};
+  const embed = new discord.MessageEmbed();
+  const image =
+    asset.image_url ||
+    asset.image_preview_url ||
+    asset.image_thumbnail_url ||
+    asset.image_original_url;
+  if (image) {
+    embed.setImage(image);
+  }
+  const links = [
+    {
+      name: "OpenSea",
+      href: asset.permalink,
+    },
+    {
+      name: "Full image",
+      href: asset.image_original_url || asset.image_url,
+    },
+    {
+      name: "Live script",
+      href: asset.animation_url || asset.animation_original_url,
+    },
+  ];
+  const linkList = links
+    .filter((link) => link.href)
+    .map((link) => `[${link.name}](${link.href})`)
+    .join(" \u00b7 ");
+  const description = `**Links:** ${linkList}`;
+  embed.setDescription(description);
+  return embed;
+}
+
 function handleListingEvent(config, bot, e) {
-  const description = `${e.asset.name} listed for ${formatWei(e.ending_price)}`;
-  const msg = `${description} <${e.asset.permalink}>`;
-  sendMessage(config, bot, config.listingsChannel(e.asset.token_id), msg);
+  const { asset } = e;
+  const content = `${asset.name} listed for ${formatWei(e.ending_price)} <${
+    asset.permalink
+  }>`;
+  sendMessage(config, bot, config.listingsChannel(e.asset.token_id), {
+    content,
+    embeds: [assetEmbed(asset)],
+  });
 }
 
 function handleSaleEvent(config, bot, e) {
-  const description = `${e.asset.name} sold for ${formatWei(e.total_price)}`;
-  const msg = `${description} <${e.asset.permalink}>`;
-  sendMessage(config, bot, config.salesChannel(e.asset.token_id), msg);
+  const { asset } = e;
+  const content = `${asset.name} sold for ${formatWei(e.total_price)} <${
+    asset.permalink
+  }>`;
+  sendMessage(config, bot, config.salesChannel(e.asset.token_id), {
+    content,
+    embeds: [assetEmbed(asset)],
+  });
 }
 
 /**
