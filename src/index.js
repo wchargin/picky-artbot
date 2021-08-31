@@ -96,6 +96,15 @@ async function main() {
   }
 }
 
+process.on("unhandledRejection", (reason, promise) => {
+  console.error(
+    "Continuing through unhandled promise rejection at:",
+    promise,
+    "; reason:",
+    reason
+  );
+});
+
 main().catch((e) => {
   console.error(e);
   process.exitCode = 1;
