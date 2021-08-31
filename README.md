@@ -5,9 +5,6 @@ them to Discord in real time. Live-configurable.
 
 ## Usage
 
-First, copy `sample.env` to `.env`, and populate the `DISCORD_TOKEN` line (see
-"Configuring Discord" below).
-
 To build:
 
 ```
@@ -15,6 +12,15 @@ node --version  # should be at least 16.6.0, for `discord.js`
 sudo apt-get install moreutils  # for `ts(1)`
 npm install
 ```
+
+To configure:
+
+-   Copy `sample.env` to `.env`, and populate the `DISCORD_TOKEN` line (see
+    "Configuring Discord" below).
+-   Copy `config.sample.json` to `config.json` and edit it as desired to
+    specify the Art Blocks projects and other NFT collections. (See
+    "Configuring Discord" for directions about finding your channel IDs.)
+
 
 To run:
 
