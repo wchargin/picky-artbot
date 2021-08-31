@@ -130,7 +130,13 @@ function formatWei(wei) {
 }
 
 async function main() {
-  const configPath = path.join(__dirname, "..", "config.json");
+  const args = process.argv.slice(2);
+  const configPath = args[0];
+  if (configPath == null) {
+    console.error("fatal: specify config.json path as first argument");
+    process.exitCode = 1;
+    return;
+  }
   const config = await Config.watchingFile(configPath);
   const bot = await createBot();
   opensea.streamEvents({
