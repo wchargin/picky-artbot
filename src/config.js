@@ -75,6 +75,10 @@ class Config {
     }
     return (this._config.discord || {})[channelKey] || null;
   }
+
+  collectionSlugs() {
+    return artblocks.COLLECTION_SLUGS;
+  }
 }
 
 module.exports = { Config };

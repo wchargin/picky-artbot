@@ -81,8 +81,11 @@ async function fetchEvents({ source, since, until, pageSize = 300 }) {
 }
 
 /**
- * Fetches all OpenSea events from the given source every `pollMs` milliseconds
- * and calls the `handleEvent` callback on each new event as it arrives.
+ * Fetches OpenSea events according to the given config, and calls the
+ * `handleEvent` callback on each new event as it arrives.
+ *
+ * The config's `collectionSlugs` method is called on *each* iteration
+ * of the poll loop to determine the collections to poll for that loop.
  *
  * The `lookbackMs` parameter works around lossy behavior in the OpenSea API
  * with small poll intervals, wherein events can be newly added to the stream
@@ -91,7 +94,7 @@ async function fetchEvents({ source, since, until, pageSize = 300 }) {
  * milliseconds. A value of `60000` (60 seconds) seems to work okay.
  */
 async function streamEvents({
-  sources,
+  config,
   pollMs,
   lookbackMs,
   handleEvent,
@@ -109,6 +112,7 @@ async function streamEvents({
   while (true) {
     const until = new Date();
 
+    const sources = config.collectionSlugs().map((slug) => ({ slug }));
     const events = [].concat(
       ...(await Promise.all(
         sources.map((source) => {

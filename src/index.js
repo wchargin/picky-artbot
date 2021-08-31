@@ -134,7 +134,7 @@ async function main() {
   const config = await Config.watchingFile(configPath);
   const bot = await createBot();
   opensea.streamEvents({
-    sources: artblocks.COLLECTION_SLUGS.map((slug) => ({ slug })),
+    config,
     pollMs: 5000,
     lookbackMs: 60000,
     handleEvent: (e) => reportEvent(config, bot, e),
